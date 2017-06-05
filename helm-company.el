@@ -59,6 +59,14 @@ Annotations will be formatted in `helm-company-annotation-face'."
   :group 'helm-company
   :type 'boolean )
 
+(defcustom helm-company-initialize-pattern-with-thing-at-point nil
+  "Use the thing-at-point as the initial helm completion pattern.
+
+The thing-at-point is whatever partial thing you've typed that
+you're trying to complete."
+  :group 'helm-company
+  :type 'boolean)
+
 (defvar helm-company-help-window nil)
 (defvar helm-company-candidates nil)
 (defvar helm-company-backend nil)
@@ -288,10 +296,14 @@ It is useful to narrow candidates."
   (interactive)
   (unless company-candidates
     (company-complete))
-  (when company-point
-    (helm :sources 'helm-source-company
-          :buffer  "*helm company*"
-          :candidate-number-limit helm-company-candidate-number-limit)))
+  (let ((initial-pattern (if helm-company-initialize-pattern-with-thing-at-point
+                             (thing-at-point 'symbol)
+                           "")))
+    (when company-point
+      (helm :sources 'helm-source-company
+            :buffer  "*helm company*"
+            :input initial-pattern
+            :candidate-number-limit helm-company-candidate-number-limit))))
 
 (provide 'helm-company)
 
